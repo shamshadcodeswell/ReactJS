@@ -1,0 +1,34 @@
+{
+  "name": "no",
+  "version": "1.0.0",
+  "description": "React",
+  "keywords": [
+    "React"
+  ],
+  "homepage": "https://github.com/shamshadcodeswell/ReactJS#readme",
+  "bugs": {
+    "url": "https://github.com/shamshadcodeswell/ReactJS/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shamshadcodeswell/ReactJS.git"
+  },
+  "license": "ISC",
+  "author": "Shamshad",
+  "type": "commonjs",
+  "scripts": {
+    "start": "parcel index.html",
+    "build": "parcel build index.html",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "parcel": "^2.16.4"
+  },
+  "dependencies": {
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
+  },
+  "browserslist": [
+    "last 2 versions"
+  ]
+}
