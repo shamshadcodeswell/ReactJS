@@ -121,3 +121,29 @@ body {
   font-size: 0.85rem;
   font-weight: 600;
 }
+.button {
+  background: linear-gradient(135deg, #ff6b35, #ff914d);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+  transition: all 0.25s ease;
+}
+
+.button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255, 107, 53, 0.4);
+}
+
+.button:active {
+  transform: translateY(0);
+}
+
+.button:focus {
+  outline: none;
+}
