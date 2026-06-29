@@ -3,6 +3,7 @@ import { API_URL, CLOUD_IMG, LOADMORE_URL } from "../../utils/constants";
 import { useEffect, useState, useRef } from "react";
 import BodyShimmer from "./BodyShimmer";
 import { Link } from "react-router-dom";
+import useGetMenu from "../../utils/useGetMenu";
 
 const Card = ({ dataList }) => {
   const {
@@ -39,25 +40,36 @@ const Body = () => {
   const [filteredResList, setFilteredResList] = useState([]);
   const [hasMore, setHasMore] = useState(true);
   const [moreRestaurants, setMoreRestaurants] = useState([]);
-
   const sentinal = useRef(null);
+
+  // useEffect(() => {
+  //   const getData = async () => {
+  //     const data = await fetch(API_URL);
+  //     const json = await data.json();
+  //     setResList(
+  //       json.data.cards[1].card.card.gridElements.infoWithStyle.restaurants,
+  //     );
+  //     setFilteredResList(
+  //       json.data.cards[1].card.card.gridElements.infoWithStyle.restaurants,
+  //     );
+  //     setMoreRestaurants(
+  //       json?.data?.cards[4]?.card?.card?.gridElements?.infoWithStyle
+  //         ?.restaurants,
+  //     );
+  //   };
+  //   getData();
+  // }, []);
+  const data = useGetMenu();
   useEffect(() => {
-    const getData = async () => {
-      const data = await fetch(API_URL);
-      const json = await data.json();
-      setResList(
-        json.data.cards[1].card.card.gridElements.infoWithStyle.restaurants,
-      );
-      setFilteredResList(
-        json.data.cards[1].card.card.gridElements.infoWithStyle.restaurants,
-      );
-      setMoreRestaurants(
-        json?.data?.cards[4]?.card?.card?.gridElements?.infoWithStyle
-          ?.restaurants,
-      );
-    };
-    getData();
-  }, []);
+    if (!data) return;
+    setResList(data.cards[1].card.card.gridElements.infoWithStyle.restaurants);
+    setFilteredResList(
+      data.cards[1].card.card.gridElements.infoWithStyle.restaurants,
+    );
+    setMoreRestaurants(
+      data?.cards[4]?.card?.card?.gridElements?.infoWithStyle?.restaurants,
+    );
+  }, [data]);
 
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
