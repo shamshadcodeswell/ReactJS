@@ -1,7 +1,8 @@
 import { API_URL, CLOUD_IMG, LOADMORE_URL } from "../../utils/constants";
-import dataList from "../../utils/mock-data";
+// import dataList from "../../utils/mock-data";
 import { useEffect, useState, useRef } from "react";
 import BodyShimmer from "./BodyShimmer";
+import { Link } from "react-router-dom";
 
 const Card = ({ dataList }) => {
   const {
@@ -36,24 +37,23 @@ const Body = () => {
   const [resList, setResList] = useState([]);
   const [search, setSearch] = useState("");
   const [filteredResList, setFilteredResList] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [nextOffset, setNextOffset] = useState("");
   const [hasMore, setHasMore] = useState(true);
-  const [csrfToken, setCsrfToken] = useState("");
+  const [moreRestaurants, setMoreRestaurants] = useState([]);
 
   const sentinal = useRef(null);
   useEffect(() => {
     const getData = async () => {
       const data = await fetch(API_URL);
       const json = await data.json();
-      console.log(json.csrfToken);
-      setNextOffset(json.data.pageOffset.nextOffset);
-      setCsrfToken(json.csrfToken);
       setResList(
         json.data.cards[1].card.card.gridElements.infoWithStyle.restaurants,
       );
       setFilteredResList(
         json.data.cards[1].card.card.gridElements.infoWithStyle.restaurants,
+      );
+      setMoreRestaurants(
+        json?.data?.cards[4]?.card?.card?.gridElements?.infoWithStyle
+          ?.restaurants,
       );
     };
     getData();
@@ -65,51 +65,27 @@ const Body = () => {
         loadMore();
       }
     });
-    if (sentinal.current) observer.observe(sentinal.current);
+    if (sentinal.current) {
+      observer.observe(sentinal.current);
+      console.log("observer attached");
+    }
     return () => observer.disconnect();
-  }, [nextOffset, isLoading, hasMore]);
+  }, [resList]);
 
   if (resList.length === 0) {
     return <BodyShimmer />;
   }
 
-  const loadMore = async () => {
-    if (isLoading || !hasMore) return;
-    setIsLoading(true);
+  const loadMore = () => {
+    if (!hasMore) return;
+    console.log("loadMore fired, moreRestaurants:", moreRestaurants.length);
 
-    const data = await fetch(LOADMORE_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        lat: 28.7077393,
-        lng: 77.10758919999999,
-        nextOffset: nextOffset,
-        page_type: "DESKTOP_WEB_LISTING",
-        filters: {},
-        seoParams: {
-          seoUrl: "https://www.swiggy.com/restaurants",
-          pageType: "FOOD_HOMEPAGE",
-          apiName: "FoodHomePage",
-        },
-        widgetOffset: {
-          NewListingView_category_bar_chicletranking_TwoRows: "",
-        },
-        _csrf: csrfToken, // ← problem child, see below
-      }),
+    setFilteredResList((prev) => {
+      const seen = new Set(prev.map((r) => r.info.id));
+      const fresh = moreRestaurants.filter((r) => !seen.has(r.info.id));
+      return [...prev, ...fresh];
     });
-
-    const json = await data.json();
-    console.log(json);
-
-    const newOffset = json.data.pageOffset.nextOffset;
-    const newRestaurants =
-      json.data.cards[0].card.card.gridElements.infoWithStyle.restaurants;
-
-    setResList((prev) => [...prev, ...newRestaurants]);
-    setFilteredResList((prev) => [...prev, ...newRestaurants]);
-    setNextOffset(newOffset);
-    if (!newOffset) setHasMore(false);
-    setIsLoading(false);
+    setHasMore(false);
   };
 
   return (
@@ -149,7 +125,9 @@ const Body = () => {
       </button>
       <div className="card-container">
         {filteredResList.map((restaurant) => (
-          <Card key={restaurant.info.id} dataList={restaurant} />
+          <Link to="/restaurant/2" key={restaurant.info.id}>
+            <Card dataList={restaurant} />
+          </Link>
         ))}
       </div>
       <div ref={sentinal}></div>
